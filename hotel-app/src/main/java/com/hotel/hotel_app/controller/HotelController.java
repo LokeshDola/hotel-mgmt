@@ -61,15 +61,51 @@ public class HotelController {
         }
     }
 
-    @PutMapping("/rooms/{roomNumber}/vacate")
-    public ResponseEntity<Room> vacateRoom(@PathVariable int roomNumber) {
-        Room updatedRoom = hotelService.vacateRoom(roomNumber);
+    // ... inside HotelController class ...
 
-        if (updatedRoom != null) {
-            return ResponseEntity.ok(updatedRoom);
-        } else {
-            return ResponseEntity.notFound().build();
+    // --- UPDATED VACATE ENDPOINT WITH VERIFICATION ---
+    @PostMapping("/rooms/{roomNumber}/vacate")
+    public ResponseEntity<?> vacateRoom(
+            @PathVariable int roomNumber, 
+            @RequestBody BookingRequest verificationDetails // Reuse BookingRequest for Name/Contact
+    ) {
+        // 1. Get the room
+        Room room = roomRepository.findByRoomNumber(roomNumber);
+        if (room == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Room not found");
         }
+        
+        // 2. Verify Room is actually booked
+        if (!room.isBooked()) {
+            return ResponseEntity.badRequest().body("Room is already empty.");
+        }
+
+        // 3. --- CRITICAL VERIFICATION STEP ---
+        // Normalize strings (trim spaces, ignore case) for better UX
+        String dbName = room.getCustomerName().trim();
+        String dbContact = room.getCustomerContact().trim();
+        
+        String inputName = verificationDetails.getCustomerName().trim();
+        String inputContact = verificationDetails.getCustomerContact().trim();
+
+        // Check matching (Case insensitive for name, exact for phone)
+        boolean nameMatch = dbName.equalsIgnoreCase(inputName);
+        boolean contactMatch = dbContact.equals(inputContact);
+
+        if (!nameMatch || !contactMatch) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("Verification Failed: Name or Contact does not match our records.");
+        }
+
+        // 4. If Verified, Proceed to Vacate
+        // Calculate Bill
+        BillDTO bill = hotelService.calculateBill(roomNumber);
+        
+        // Clear Room Data
+        hotelService.vacateRoom(roomNumber);
+        
+        // Return Bill
+        return ResponseEntity.ok(bill);
     }
 
     // --- Bill Endpoint ---

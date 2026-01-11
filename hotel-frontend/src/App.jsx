@@ -14,6 +14,10 @@ const API_BASE_URL = "http://localhost:8080/api";
 
 // --- 1. UPDATE NAVIGATION TO ACCEPT LOGOUT ---
 function Navigation({ isAuthenticated, onLogout }) {
+  const location = useLocation();
+
+  const hideNavLinks = location.pathname === '/' || location.pathname === '/admin';
+
   return (
     <nav className="main-nav">
       <NavLink 
@@ -22,20 +26,26 @@ function Navigation({ isAuthenticated, onLogout }) {
       >
         Home
       </NavLink>
-      <NavLink 
-        to="/rooms" 
-        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-      >
-        Room Status
-      </NavLink>
-      <NavLink 
-        to="/food" 
-        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
-      >
-        Food Service
-      </NavLink>
+
+      {/* ONLY SHOW LINKS IF NOT ON HOME OR LOGIN PAGE */}
+      {!hideNavLinks && (
+        <>
+          <NavLink 
+            to="/rooms" 
+            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+          >
+            Room Status
+          </NavLink>
+          <NavLink 
+            to="/food" 
+            className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
+          >
+            Food Service
+          </NavLink>
+        </>
+      )}
       
-      {/* --- SHOW DASHBOARD & STYLISH LOGOUT IF LOGGED IN --- */}
+      {/* SHOW DASHBOARD & LOGOUT ONLY IF LOGGED IN */}
       {isAuthenticated && (
         <>
           <NavLink 
@@ -44,8 +54,6 @@ function Navigation({ isAuthenticated, onLogout }) {
           >
             Manager Dashboard
           </NavLink>
-          
-          {/* Updated Button Class */}
           <button 
             onClick={onLogout} 
             className="nav-btn-logout"
@@ -56,7 +64,7 @@ function Navigation({ isAuthenticated, onLogout }) {
       )}
     </nav>
   );
-}
+} 
 
 
 function App() {
@@ -287,7 +295,7 @@ function App() {
       {!isLoading && !error && (
         <Routes>
           <Route path="/" element={<WelcomePage />} />
-          <Route path="/rooms" element={<RoomPage rooms={rooms} onBook={openBookingModal} />} />
+          <Route path="/rooms" element={<RoomPage rooms={rooms} onBook={openBookingModal} isAuthenticated={isAuthenticated} />} />
           <Route path="/food" element={<FoodPage menu={menu} foodOrders={foodOrders} cartItems={cartItems} onAddToCart={handleAddToCart} onUpdateCartQuantity={handleUpdateCartQuantity} onPlaceOrder={openCheckoutModal} />} />
           <Route path="/room/:roomNumber/vacate" element={<VacatePage />} />
           <Route path="/admin" element={<AdminLogin onLogin={handleLogin} />} />

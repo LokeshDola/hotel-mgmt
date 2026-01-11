@@ -1,87 +1,119 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // <-- ADD THIS
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import VacateModal from './VacateModal'; // Import the new modal
+import './App.css';
 
-// onVacate prop is GONE
-function RoomPage({ rooms, onBook }) {
-  return (
-    <div className="room-status-column">
-      <h2 className="section-title">Room Status</h2>
-      <RoomTable
-        rooms={rooms}
-        onBook={onBook}
-        // onVacate prop is GONE
-      />
-    </div>
-  );
-}
+const API_BASE_URL = "http://localhost:8080/api";
 
-// --- RoomTable Component ---
-// onVacate prop is GONE
-function RoomTable({ rooms, onBook }) {
-  return (
-    <div className="table-wrapper">
-      <table className="app-table">
-        <thead>
-          <tr>
-            <th>Room #</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Customer</th>
-            <th>Price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rooms.map(room => (
-            <RoomRow 
-              key={room.id} 
-              room={room} 
-              onBook={onBook}
-              // onVacate prop is GONE
-            />
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+function RoomPage({ rooms, onBook, isAuthenticated }) {
+  const navigate = useNavigate();
+  const [selectedRoomForVacate, setSelectedRoomForVacate] = useState(null);
 
-// --- RoomRow Component ---
-// onVacate prop is GONE
-function RoomRow({ room, onBook }) {
-  const isBooked = room.booked;
-  const navigate = useNavigate(); // <-- ADD THIS
+  // Sort rooms
+  const sortedRooms = [...rooms].sort((a, b) => a.roomNumber - b.roomNumber);
 
-  // NEW click handler for the vacate button
-  const handleVacateClick = () => {
-    navigate(`/room/${room.roomNumber}/vacate`);
+  // Handle Vacate Click - Open Modal
+  const handleVacateClick = (room) => {
+    setSelectedRoomForVacate(room);
+  };
+
+  // Handle Verification Submit
+  const handleVerifyAndVacate = (roomNumber, name, contact) => {
+    // API Call to Verify and Vacate
+    fetch(`${API_BASE_URL}/rooms/${roomNumber}/vacate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customerName: name, customerContact: contact })
+    })
+    .then(async (res) => {
+      if (res.ok) {
+        // Success! Get bill data and navigate to bill page
+        const billData = await res.json();
+        // We pass the bill data via state to the next page
+        navigate(`/room/${roomNumber}/vacate`, { state: { bill: billData } }); 
+      } else {
+        // Failure - Show alert
+        const errorMsg = await res.text();
+        alert(errorMsg);
+      }
+    })
+    .catch(err => alert("Network Error: " + err.message));
   };
 
   return (
+    <div className="container"> 
+      <div className="table-wrapper">
+        <h3 style={{padding: '1rem', borderBottom: '1px solid #eee', margin: 0}}>Room Status</h3>
+        <table className="app-table">
+          <thead>
+            <tr>
+              <th>Room #</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Customer</th>
+              <th>Price</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sortedRooms.map(room => (
+              <RoomRow 
+                key={room.id} 
+                room={room} 
+                onBook={onBook} 
+                isAuthenticated={isAuthenticated}
+                onVacateClick={() => handleVacateClick(room)} // Pass handler
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Render Vacate Verification Modal */}
+      {selectedRoomForVacate && (
+        <VacateModal 
+          room={selectedRoomForVacate} 
+          onClose={() => setSelectedRoomForVacate(null)}
+          onVerify={handleVerifyAndVacate}
+        />
+      )}
+    </div>
+  );
+}
+
+function RoomRow({ room, onBook, isAuthenticated, onVacateClick }) {
+  const isBooked = room.booked;
+
+  return (
     <tr>
-      <td>{room.roomNumber}</td>
-      <td className="room-type">{room.roomType}</td>
+      <td style={{fontWeight: '600'}}>{room.roomNumber}</td>
+      <td>{room.roomType}</td>
       <td>
-        {isBooked ? (
-          <span className="status-booked">Booked</span>
-        ) : (
-          <span className="status-available">Available</span>
-        )}
+        <span className={isBooked ? 'status-booked' : 'status-available'}>
+          {isBooked ? 'Booked' : 'Available'}
+        </span>
       </td>
-      <td>{isBooked ? room.customerName : '---'}</td>
+      
+      <td style={{color: '#636e72', fontStyle: isBooked ? 'normal' : 'italic'}}>
+        {isBooked 
+          ? (isAuthenticated ? room.customerName : 'Occupied') 
+          : '---'}
+      </td>
+
       <td>₹{room.price.toFixed(2)}</td>
       <td>
         {isBooked ? (
-          <button
-            onClick={handleVacateClick} // <-- USE NEW HANDLER
+          // Change Link to Button to open Modal
+          <button 
             className="action-button btn-vacate"
+            onClick={onVacateClick}
           >
             Vacate
           </button>
         ) : (
-          <button
+          <button 
+            className="action-button btn-book" 
             onClick={() => onBook(room)}
-            className="action-button btn-book"
           >
             Book Now
           </button>
