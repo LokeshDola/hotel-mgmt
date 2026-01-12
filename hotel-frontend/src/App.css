@@ -496,3 +496,30 @@
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* --- New Guest Login Styles --- */
+.guest-input {
+  width: 100%;
+  padding: 12px 20px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50px;
+  outline: none;
+  transition: all 0.3s;
+  font-family: 'Poppins', sans-serif;
+}
+.guest-input:focus {
+  border-color: #d4af37; /* Gold focus */
+  background: white;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+}
+
+/* Vacate Button in Menu (Red/Orange Gradient) */
+.btn-vacate-menu {
+  background: linear-gradient(135deg, #e17055, #d63031);
+}
+.btn-vacate-menu:hover {
+  background: linear-gradient(135deg, #d63031, #c0392b);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(214, 48, 49, 0.4);
+}

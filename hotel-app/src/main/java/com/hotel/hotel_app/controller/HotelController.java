@@ -60,8 +60,8 @@ public class HotelController {
             return ResponseEntity.notFound().build();
         }
     }
+    
 
-    // ... inside HotelController class ...
 
     // --- UPDATED VACATE ENDPOINT WITH VERIFICATION ---
     @PostMapping("/rooms/{roomNumber}/vacate")
@@ -157,5 +157,24 @@ public class HotelController {
     @GetMapping("/customers")
     public List<com.hotel.hotel_app.model.CustomerDashboardDTO> getCustomers() {
         return hotelService.getCustomerDashboard();
+    }
+    // ... inside HotelController ...
+
+    // --- NEW ENDPOINT: CHECK GUEST STATUS ---
+    @GetMapping("/guest-check")
+    public ResponseEntity<?> checkGuestStatus(@RequestParam String contact) {
+        Room activeRoom = roomRepository.findByCustomerContact(contact);
+        
+        if (activeRoom != null) {
+            // Guest has a booking
+            return ResponseEntity.ok(java.util.Map.of(
+                "hasBooking", true,
+                "roomNumber", activeRoom.getRoomNumber(),
+                "customerName", activeRoom.getCustomerName()
+            ));
+        } else {
+            // Guest is new (no active booking)
+            return ResponseEntity.ok(java.util.Map.of("hasBooking", false));
+        }
     }
 }
