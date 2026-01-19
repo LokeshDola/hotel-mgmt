@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import VacateModal from './VacateModal'; 
 import './App.css';
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
 
 function RoomPage({ rooms, onBook, isAuthenticated }) {
   const navigate = useNavigate();

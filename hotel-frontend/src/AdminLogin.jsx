@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
 
 function AdminLogin({ onLogin }) {
   const [username, setUsername] = useState("");

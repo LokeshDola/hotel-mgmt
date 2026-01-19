@@ -10,7 +10,7 @@ import WelcomePage from './WelcomePage.jsx';
 import AdminLogin from './AdminLogin.jsx'; 
 import AdminDashboard from './AdminDashboard_TEMP.jsx'; 
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
 
 // --- 1. UPDATE NAVIGATION TO ACCEPT LOGOUT ---
 function Navigation({ isAuthenticated, onLogout }) {
