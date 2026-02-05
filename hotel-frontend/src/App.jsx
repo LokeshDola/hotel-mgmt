@@ -9,6 +9,7 @@ import VacatePage from './VacatePage_TEMP.jsx';
 import WelcomePage from './WelcomePage.jsx';
 import AdminLogin from './AdminLogin.jsx'; 
 import AdminDashboard from './AdminDashboard_TEMP.jsx'; 
+import Chatbot from './Chatbot';
 
 const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
 
@@ -310,6 +311,8 @@ function App() {
       {isOrderModalOpen && (
         <FoodOrderModal item={selectedFoodItem} bookedRooms={bookedRooms} onClose={closeOrderModal} onSubmit={handlePlaceOrder} />
       )}
+
+      <Chatbot />
 
     </div>
   );

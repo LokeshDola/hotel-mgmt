@@ -1,0 +1,18 @@
+[33m1cfa3b9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m Changes
+[33m1e80aed[m Latest Version
+[33m6c29b95[m Changes in Code
+[33mef9279e[m Change in App.jsx
+[33mffefc26[m Fixed App.jsx hero duplicate and updated Welcome Page
+[33m3fe3422[m Fixed App.jsx hero duplicate and updated Welcome Page
+[33m3712a98[m Changes In Welcome Page
+[33m0a5d44e[m Changes in UI
+[33m8d312f3[m New Changes
+[33mdfaacbc[m New UI Changes
+[33ma17b205[m changed UI Design
+[33m09b551f[m Connected frontend to Render backend
+[33mb360896[m Fixed DB_URL typo and added multi-stage Dockerfile
+[33meeef7b5[m Updated New Features for  Vacation Page
+[33m459aa1c[m Updated New Endpoints with VacateModal
+[33m24d560b[m Modified Readme file
+[33m9900d55[m Added new README file for understanding tech stack of project
+[33mc66a682[m Initial commit: Complete Hotel Management System
