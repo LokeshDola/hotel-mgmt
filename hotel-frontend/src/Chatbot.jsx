@@ -42,7 +42,7 @@ function Chatbot() {
       `;
 
       const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
       const prompt = `${hotelContext}\n\nGuest: ${input}\nConcierge:`;
       
       const result = await model.generateContent(prompt);
