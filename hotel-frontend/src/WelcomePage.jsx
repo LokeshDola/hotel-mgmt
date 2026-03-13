@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import 'regenerator-runtime/runtime'; // Added for Voice Support
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'; // Added for Voice Support
 import './App.css';
 
 const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
@@ -23,6 +25,40 @@ function WelcomePage() {
   const handleGuestClick = () => {
     setStep('guest-login');
   };
+
+  const handleBack = () => {
+    setStep('role');
+    setGuestContact("");
+    setActiveBooking(null);
+    localStorage.removeItem('activeGuestBooking'); // Clear if they go back
+  };
+
+  // --- NEW: VOICE COMMANDS SETUP ---
+  const commands = [
+    {
+      command: ['manager login', 'go to manager', 'open manager'],
+      callback: () => handleManagerClick()
+    },
+    {
+      command: ['guest services', 'go to guest', 'open guest'],
+      callback: () => handleGuestClick()
+    },
+    {
+      command: ['book a room', 'vacate room', 'go to rooms', 'rooms'],
+      callback: () => navigate('/rooms')
+    },
+    {
+      command: ['order food', 'dining', 'food', 'room service'],
+      callback: () => navigate('/food')
+    },
+    {
+      command: ['go back', 'exit'],
+      callback: () => handleBack()
+    }
+  ];
+
+  const { transcript, listening, browserSupportsSpeechRecognition } = useSpeechRecognition({ commands });
+  // ---------------------------------
 
   const handleContactChange = (e) => {
     const value = e.target.value;
@@ -59,13 +95,6 @@ function WelcomePage() {
         alert("Connection Error. Please try again.");
       })
       .finally(() => setIsLoading(false));
-  };
-
-  const handleBack = () => {
-    setStep('role');
-    setGuestContact("");
-    setActiveBooking(null);
-    localStorage.removeItem('activeGuestBooking'); // Clear if they go back
   };
 
   return (
@@ -157,6 +186,34 @@ function WelcomePage() {
           <button onClick={handleBack} className="btn-back-link">← Exit</button>
         </div>
       )}
+
+      {/* --- NEW: VOICE CONTROLS UI --- */}
+      {browserSupportsSpeechRecognition && (
+        <div className="voice-controls fade-in" style={{ marginTop: '40px', textAlign: 'center', padding: '15px' }}>
+          <p style={{ marginBottom: '10px', fontWeight: 'bold', color: '#444' }}>🎙️ Hands-Free Navigation</p>
+          <button 
+            onClick={() => listening ? SpeechRecognition.stopListening() : SpeechRecognition.startListening({ continuous: true })}
+            style={{ 
+              padding: '10px 20px', 
+              backgroundColor: listening ? '#ff4c4c' : '#2196f3', 
+              color: 'white', 
+              borderRadius: '25px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '15px',
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              transition: 'background-color 0.3s'
+            }}
+          >
+            {listening ? '🔴 Listening...' : '🎤 Click to Speak'}
+          </button>
+          <p style={{ marginTop: '10px', color: '#666', fontSize: '13px', fontStyle: 'italic', minHeight: '20px' }}>
+            {listening ? `Heard: "${transcript}"` : 'Try saying: "Guest Services" or "Manager Login"'}
+          </p>
+        </div>
+      )}
+      {/* --------------------------------- */}
+
     </div>
   );
 }
