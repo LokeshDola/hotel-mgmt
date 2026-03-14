@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import 'regenerator-runtime/runtime'; // Added for Voice Support
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'; // Added for Voice Support
+import 'regenerator-runtime/runtime'; 
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'; 
 import './App.css';
 
 const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
@@ -14,8 +14,6 @@ function WelcomePage() {
   
   const navigate = useNavigate();
 
-  // --- 1. CLEANUP ON LOAD ---
-  // Whenever user comes to Home, clear previous guest session
   useEffect(() => {
     localStorage.removeItem('activeGuestBooking');
   }, []);
@@ -30,10 +28,10 @@ function WelcomePage() {
     setStep('role');
     setGuestContact("");
     setActiveBooking(null);
-    localStorage.removeItem('activeGuestBooking'); // Clear if they go back
+    localStorage.removeItem('activeGuestBooking'); 
   };
 
-  // --- NEW: VOICE COMMANDS SETUP ---
+  // --- UPDATED: VOICE COMMANDS SETUP ---
   const commands = [
     {
       command: ['manager login', 'go to manager', 'open manager'],
@@ -42,6 +40,32 @@ function WelcomePage() {
     {
       command: ['guest services', 'go to guest', 'open guest'],
       callback: () => handleGuestClick()
+    },
+    // NEW: Capture Phone Number
+    {
+      command: ['number *', 'phone *', 'enter *', 'my number is *'],
+      callback: (spokenText) => {
+        // Convert any spoken words to digits (e.g. "nine" -> "9")
+        const wordsToNumbers = { 'zero':'0', 'one':'1', 'two':'2', 'three':'3', 'four':'4', 'five':'5', 'six':'6', 'seven':'7', 'eight':'8', 'nine':'9' };
+        let parsedText = spokenText.toLowerCase();
+        Object.keys(wordsToNumbers).forEach(word => {
+          parsedText = parsedText.replaceAll(word, wordsToNumbers[word]);
+        });
+        
+        // Extract only the numbers
+        const digits = parsedText.replace(/[^0-9]/g, '');
+        if (digits.length <= 10) {
+          setGuestContact(digits);
+        }
+      }
+    },
+    // NEW: Submit Form
+    {
+      command: ['continue', 'submit', 'verify', 'login'],
+      callback: () => {
+        const btn = document.getElementById('guest-submit-btn');
+        if (btn && !btn.disabled) btn.click();
+      }
     },
     {
       command: ['book a room', 'vacate room', 'go to rooms', 'rooms'],
@@ -69,7 +93,8 @@ function WelcomePage() {
   };
 
   const handleGuestCheck = (e) => {
-    e.preventDefault();
+    if(e) e.preventDefault(); // Updated to allow direct voice calling
+    
     if (guestContact.length !== 10) {
       alert("Please enter a valid 10-digit mobile number.");
       return;
@@ -82,11 +107,9 @@ function WelcomePage() {
       .then(data => {
         if (data.hasBooking) {
           setActiveBooking(data);
-          // --- 2. SAVE TO LOCAL STORAGE ---
           localStorage.setItem('activeGuestBooking', JSON.stringify(data));
         } else {
           setActiveBooking(null);
-          // Also save that they are a guest but have no booking
           localStorage.setItem('activeGuestBooking', JSON.stringify({ hasBooking: false }));
         }
         setStep('services');
@@ -143,7 +166,9 @@ function WelcomePage() {
                 {guestContact.length}/10
               </div>
             </div>
+            {/* Added ID to button for voice targeting */}
             <button 
+              id="guest-submit-btn"
               type="submit" 
               className="welcome-nav-btn btn-guest-role" 
               disabled={isLoading || guestContact.length !== 10}
@@ -187,7 +212,6 @@ function WelcomePage() {
         </div>
       )}
 
-      {/* --- NEW: VOICE CONTROLS UI --- */}
       {browserSupportsSpeechRecognition && (
         <div className="voice-controls fade-in" style={{ marginTop: '40px', textAlign: 'center', padding: '15px' }}>
           <p style={{ marginBottom: '10px', fontWeight: 'bold', color: '#444' }}>🎙️ Hands-Free Navigation</p>
@@ -208,11 +232,10 @@ function WelcomePage() {
             {listening ? '🔴 Listening...' : '🎤 Click to Speak'}
           </button>
           <p style={{ marginTop: '10px', color: '#666', fontSize: '13px', fontStyle: 'italic', minHeight: '20px' }}>
-            {listening ? `Heard: "${transcript}"` : 'Try saying: "Guest Services" or "Manager Login"'}
+            {listening ? `Heard: "${transcript}"` : 'Say "Guest Services", "Number [123...]", then "Continue"'}
           </p>
         </div>
       )}
-      {/* --------------------------------- */}
 
     </div>
   );
