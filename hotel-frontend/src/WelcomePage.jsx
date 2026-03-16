@@ -31,7 +31,6 @@ function WelcomePage() {
     localStorage.removeItem('activeGuestBooking'); 
   };
 
-  // --- UPDATED: VOICE COMMANDS SETUP ---
   const commands = [
     {
       command: ['manager login', 'go to manager', 'open manager'],
@@ -41,25 +40,21 @@ function WelcomePage() {
       command: ['guest services', 'go to guest', 'open guest'],
       callback: () => handleGuestClick()
     },
-    // NEW: Capture Phone Number
     {
       command: ['number *', 'phone *', 'enter *', 'my number is *'],
       callback: (spokenText) => {
-        // Convert any spoken words to digits (e.g. "nine" -> "9")
         const wordsToNumbers = { 'zero':'0', 'one':'1', 'two':'2', 'three':'3', 'four':'4', 'five':'5', 'six':'6', 'seven':'7', 'eight':'8', 'nine':'9' };
         let parsedText = spokenText.toLowerCase();
         Object.keys(wordsToNumbers).forEach(word => {
           parsedText = parsedText.replaceAll(word, wordsToNumbers[word]);
         });
         
-        // Extract only the numbers
         const digits = parsedText.replace(/[^0-9]/g, '');
         if (digits.length <= 10) {
           setGuestContact(digits);
         }
       }
     },
-    // NEW: Submit Form
     {
       command: ['continue', 'submit', 'verify', 'login'],
       callback: () => {
@@ -71,9 +66,15 @@ function WelcomePage() {
       command: ['book a room', 'vacate room', 'go to rooms', 'rooms'],
       callback: () => navigate('/rooms')
     },
+    // --- UPDATED: Dining voice command ---
     {
-      command: ['order food', 'dining', 'food', 'room service'],
+      command: ['order food', 'dining', 'food', 'dining and room service', '* dining *'],
       callback: () => navigate('/food')
+    },
+    // --- NEW: Room Cleaning & Decoration voice command ---
+    {
+      command: ['room cleaning', 'cleaning', 'decoration', 'decorating', 'room service request', 'housekeeping'],
+      callback: () => navigate('/room-service')
     },
     {
       command: ['go back', 'exit'],
@@ -82,7 +83,6 @@ function WelcomePage() {
   ];
 
   const { transcript, listening, browserSupportsSpeechRecognition } = useSpeechRecognition({ commands });
-  // ---------------------------------
 
   const handleContactChange = (e) => {
     const value = e.target.value;
@@ -93,7 +93,7 @@ function WelcomePage() {
   };
 
   const handleGuestCheck = (e) => {
-    if(e) e.preventDefault(); // Updated to allow direct voice calling
+    if(e) e.preventDefault(); 
     
     if (guestContact.length !== 10) {
       alert("Please enter a valid 10-digit mobile number.");
@@ -166,7 +166,6 @@ function WelcomePage() {
                 {guestContact.length}/10
               </div>
             </div>
-            {/* Added ID to button for voice targeting */}
             <button 
               id="guest-submit-btn"
               type="submit" 
@@ -204,9 +203,16 @@ function WelcomePage() {
                 Book a Room
               </Link>
             )}
+            
             <Link to="/food" className="welcome-nav-btn btn-food">
               Dining & Room Service
             </Link>
+            
+            {/* --- NEW: Room Cleaning & Decoration Button --- */}
+            <Link to="/room-service" className="welcome-nav-btn btn-rooms" style={{ marginTop: '10px', backgroundColor: '#e17055' }}>
+              Room Cleaning & Decoration
+            </Link>
+
           </div>
           <button onClick={handleBack} className="btn-back-link">← Exit</button>
         </div>

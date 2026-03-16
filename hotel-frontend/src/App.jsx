@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
+
 import './App.css';
 
 // Page Imports
@@ -10,6 +11,7 @@ import WelcomePage from './WelcomePage.jsx';
 import AdminLogin from './AdminLogin.jsx'; 
 import AdminDashboard from './AdminDashboard_TEMP.jsx'; 
 import Chatbot from './Chatbot';
+import RoomServicePage from './RoomServicePage';
 
 const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
 
@@ -301,6 +303,7 @@ function App() {
           <Route path="/room/:roomNumber/vacate" element={<VacatePage />} />
           <Route path="/admin" element={<AdminLogin onLogin={handleLogin} />} />
           <Route path="/admin/dashboard" element={<AdminDashboard isAuthenticated={isAuthenticated} onLogout={handleLogout} />} />
+          <Route path="/room-service" element={<RoomServicePage />} />
         </Routes>
       )}
 
