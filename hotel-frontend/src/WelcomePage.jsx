@@ -73,7 +73,16 @@ function WelcomePage() {
     },
     // --- NEW: Room Cleaning & Decoration voice command ---
     {
-      command: ['room cleaning', 'cleaning', 'decoration', 'decorating', 'room service request', 'housekeeping'],
+      command: [
+        'room cleaning', 
+        'cleaning', 
+        'decoration', 
+        'decorating', 
+        'housekeeping', 
+        'room cleaning and decoration', 
+        '* room cleaning *', 
+        '* decoration *'
+      ],
       callback: () => navigate('/room-service')
     },
     {
@@ -205,7 +214,7 @@ function WelcomePage() {
             )}
             
             <Link to="/food" className="welcome-nav-btn btn-food">
-              Dining & Room Service
+              Dining & Food Service
             </Link>
             
             {/* --- NEW: Room Cleaning & Decoration Button --- */}
