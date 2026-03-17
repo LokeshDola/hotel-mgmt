@@ -32,7 +32,23 @@ function AdminDashboard({ isAuthenticated, onLogout }) {
       </div>
 
       <div className="table-wrapper" style={{marginTop: '2rem'}}>
-        <h3 style={{padding: '1rem', borderBottom: '1px solid #eee'}}>Customer Database</h3>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid #eee' }}>
+          <h3 style={{ margin: 0 }}>Customer Database</h3>
+          <button 
+            onClick={() => navigate('/admin/room-services')} 
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#e17055',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            ⚙️ Manage Room Services
+          </button>
+        </div>
         <table className="app-table">
           <thead>
             <tr>
@@ -54,28 +70,22 @@ function AdminDashboard({ isAuthenticated, onLogout }) {
                 <td>{customer.name}</td>
                 <td>{customer.contact}</td>
                 
-                {/* Room Number */}
                 <td style={{fontWeight: 'bold'}}>
                   {customer.roomNumber}
                 </td>
 
-                {/* Room Status (Occupied/Checked Out) */}
                 <td>
                   <span className={customer.roomStatus === 'Occupied' ? 'status-booked' : 'status-available'}>
                     {customer.roomStatus}
                   </span>
                 </td>
 
-                {/* Room Bill */}
                 <td style={{color: '#555'}}>₹{customer.roomBill.toFixed(2)}</td>
 
-                {/* Food Bill */}
                 <td style={{color: '#555'}}>₹{customer.foodBill.toFixed(2)}</td>
                 
-                {/* Total Bill */}
                 <td style={{fontWeight: 'bold', color: '#2c3e50'}}>₹{customer.totalBill.toFixed(2)}</td>
 
-                {/* Bill Status Badge */}
                 <td>
                    <span style={{
                      padding: '4px 8px', 
