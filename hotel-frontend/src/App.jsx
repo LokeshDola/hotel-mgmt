@@ -12,6 +12,7 @@ import AdminLogin from './AdminLogin.jsx';
 import AdminDashboard from './AdminDashboard_TEMP.jsx'; 
 import Chatbot from './Chatbot';
 import RoomServicePage from './RoomServicePage';
+import RoomServiceManager from './RoomServiceManager';
 
 const API_BASE_URL = "https://hotel-mgmt-0uje.onrender.com/api";
 
@@ -304,6 +305,7 @@ function App() {
           <Route path="/admin" element={<AdminLogin onLogin={handleLogin} />} />
           <Route path="/admin/dashboard" element={<AdminDashboard isAuthenticated={isAuthenticated} onLogout={handleLogout} />} />
           <Route path="/room-service" element={<RoomServicePage />} />
+          <Route path="/admin/room-services" element={<RoomServiceManager />} />
         </Routes>
       )}
 

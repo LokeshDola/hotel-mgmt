@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 
@@ -9,8 +9,22 @@ function RoomServicePage() {
     const [serviceType, setServiceType] = useState('Cleaning');
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const bookingData = localStorage.getItem('activeGuestBooking');
+        if (bookingData) {
+            const parsedData = JSON.parse(bookingData);
+            if (parsedData.roomNumber) {
+                setRoomNumber(parsedData.roomNumber);
+            }
+        }
+    }, []);
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!roomNumber) {
+            alert("No active room booking found.");
+            return;
+        }
         fetch(`${API_BASE_URL}/room-service/request`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -28,12 +42,10 @@ function RoomServicePage() {
                 <div className="form-group">
                     <input 
                         type="text" 
-                        placeholder="Room Number" 
                         value={roomNumber}
-                        onChange={e => setRoomNumber(e.target.value)}
-                        required
+                        readOnly
                         className="guest-input"
-                        style={{textAlign: 'center', fontSize: '1.2rem', marginBottom: '1rem'}}
+                        style={{textAlign: 'center', fontSize: '1.2rem', marginBottom: '1rem', backgroundColor: '#e9ecef'}}
                     />
                 </div>
                 <div className="form-group">
@@ -48,7 +60,7 @@ function RoomServicePage() {
                     </select>
                 </div>
                 <button type="submit" className="welcome-nav-btn btn-guest-role" style={{width: '100%'}}>
-                    Submit Request
+                    SUBMIT REQUEST
                 </button>
             </form>
             <button onClick={() => navigate('/')} className="btn-back-link" style={{marginTop: '2rem'}}>← Back to Home</button>
