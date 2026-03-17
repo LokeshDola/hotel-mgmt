@@ -282,7 +282,7 @@ function App() {
   return (
     <div className="container">
       <h1 className="header">
-        Hotel Management System
+        AI Smart Hotel Automation
       </h1>
       
       {/* --- 2. PASS LOGOUT HANDLER TO NAVIGATION --- */}
